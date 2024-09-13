@@ -39,9 +39,9 @@ def generative_search(query:str):
     )
     res=[]
     for i in data['matches']:
-        res.append({"text":i['metadata']['text']})
-    ranked_documents=coher_object.run(query=query,top_n=2,documents=res)
-
+        res.append({"text":i['metadata']['text'],"page_no":i['metadata']['page'],"doc_name":i['metadata']['doc_name']})
+    ranked_documents=coher_object.run(query=query,top_n=1,documents=res)
+    print(ranked_documents['documents'][0])
     response=generate_answer(query=query,doc_text=ranked_documents['documents'][0]["text"])
-    return {"answer":response,"context":ranked_documents['documents'][0]["text"],"page_no":i['metadata']['page'],"doc_name":i['metadata']['doc_name']}
+    return {"answer":response,"context":ranked_documents['documents'][0]["text"],"page_no":ranked_documents['documents'][0]['page_no'],"doc_name":ranked_documents['documents'][0]['doc_name']}
 
