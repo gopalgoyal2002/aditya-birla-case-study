@@ -1,0 +1,41 @@
+# Define custom function directory
+ARG FUNCTION_DIR="/function"
+
+FROM public.ecr.aws/docker/library/python:3.9-buster as build-image
+#FROM python:buster as build-image
+# Include global arg in this stage of the build
+ARG FUNCTION_DIR
+# Copy function code
+RUN mkdir -p ${FUNCTION_DIR}
+
+# Install the function's dependencies
+RUN pip install \
+    --target ${FUNCTION_DIR} \
+        awslambdaric
+
+FROM public.ecr.aws/docker/library/python:3.9-buster
+
+
+ARG FUNCTION_DIR
+# Set working directory to function root directory
+WORKDIR ${FUNCTION_DIR}
+
+
+
+COPY requirements.txt ${FUNCTION_DIR}
+RUN pip install -r requirements.txt
+
+ENV HOME=/tmp
+
+COPY __init__.py  app.py config.py ${FUNCTION_DIR}
+
+# Copy in the built dependencies
+COPY --from=build-image ${FUNCTION_DIR} ${FUNCTION_DIR}
+
+#COPY ./entry_script.sh /entry_script.sh
+#RUN chmod +x /entry_script.sh
+#ADD aws-lambda-rie /usr/local/bin/aws-lambda-rie
+#ENTRYPOINT [ "/entry_script.sh" ]
+
+ENTRYPOINT [ "/usr/local/bin/python", "-m", "awslambdaric" ]
+CMD [ "app.handler" ]

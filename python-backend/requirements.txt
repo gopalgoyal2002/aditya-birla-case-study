@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+requests
+mangum
+python-jose[cryptography]
+passlib[bcrypt]
+pymongo
+boto3
+uuid
+PyJWT
+python-multipart
+pinecone-client
+openai
+cohere==4.37 
